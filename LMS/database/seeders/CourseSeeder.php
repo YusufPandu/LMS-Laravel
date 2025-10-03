@@ -10,8 +10,7 @@ class CourseSeeder extends Seeder
 {
     public function run(): void
     {
-        $instructor = User::where('role', 'instructor')->first();
-
+        $instructor = User::where('role_id', '2')->first();
         Course::create([
             'title' => 'Intro to Laravel',
             'description' => 'Learn the basics of Laravel framework.',

@@ -2,47 +2,93 @@
 
 namespace App\Models;
 
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
+    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var list<string>
+     */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role',
+        'role_id',
         'profile_picture',
     ];
 
-    protected $hidden = ['password'];
+    /**
+     * The attributes that should be hidden for serialization.
+     *
+     * @var list<string>
+     */
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
-    // 🔗 Relationships
-    public function courses() // sebagai Instructor
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
     {
-        return $this->hasMany(Course::class, 'instructor_id');
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
     }
 
-    public function submissions()
+    public function role()
     {
-        return $this->hasMany(Submission::class, 'student_id');
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
-    public function progresses()
+    public function hasPermission(string $permission): bool
     {
-        return $this->hasMany(Progress::class, 'student_id');
+        return $this->role?->hasPermission($permission) ?? false;
     }
 
-    public function certificates()
-    {
-        return $this->hasMany(Certificate::class, 'student_id');
+    public function hasAnyPermission(array $permissions): bool{
+        foreach ($permissions as $permission){
+            if($this->hasPermission($permission)){
+                return true;
+            }
+        }
+        return false;
     }
 
-    public function discussions()
-    {
-        return $this->hasMany(Discussion::class);
+    public function hasAllPermissions(array $permissions) : bool{
+        foreach ($permissions as $permission){
+            if(!$this->hasPermission($permission)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function getRoleName(): string{
+        return $this->role?->name ?? 'No Role';
+    }
+
+    public function isAdmin():bool{
+        return $this->getRoleName() === 'admin';
+    }
+    public function isInstructor():bool{
+        return $this->getRoleName() === 'instructor';
+    }
+    public function isStudent():bool{
+        return $this->getRoleName() === 'student';
     }
 }

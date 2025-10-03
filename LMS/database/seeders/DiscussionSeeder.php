@@ -12,7 +12,7 @@ class DiscussionSeeder extends Seeder
     public function run(): void
     {
         $course = Course::first();
-        $student = User::where('role', 'student')->first();
+        $student = User::where('role_id', '3')->first();
 
         Discussion::create([
             'course_id' => $course->id,

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -10,28 +11,34 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // Admin
-        User::create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'admin',
-        ]);
+        $adminRole = Role::where('name', 'admin')->first();
+        $instructorRole = Role::where('name', 'instructor')->first();
+        $studentRole = Role::where('name', 'student')->first();
+        User::updateOrCreate(
+            ['email' => 'admin@example.com'],
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('12345'),
+                'role_id' => $adminRole->id,
+            ]
+        );
 
-        // Instructor
-        User::create([
-            'name' => 'John Instructor',
-            'email' => 'instructor@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'instructor',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'instructor@example.com'],
+            [
+                'name' => 'John Instructor',
+                'password' => Hash::make('12345'),
+                'role_id' => $instructorRole->id,
+            ]
+        );
 
-        // Student
-        User::create([
-            'name' => 'Jane Student',
-            'email' => 'student@example.com',
-            'password' => Hash::make('password'),
-            'role' => 'student',
-        ]);
+        User::updateOrCreate(
+            ['email' => 'student@example.com'],
+            [
+                'name' => 'Jane Student',
+                'password' => Hash::make('12345'),
+                'role_id' => $studentRole->id,
+            ]
+        );
     }
 }
