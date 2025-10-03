@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\CourseController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -7,9 +9,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -17,11 +16,29 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::middleware(['auth', 'permission:manage_users'])->group(function () {
-    Route::get('/admin', function () {
-        return "Admin Dashboard";
-    })->name('admin.dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])
+        ->name('dashboard');
 });
+
+Route::middleware(['auth', 'permission:dashboard_admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])
+            ->name('dashboard');
+    });
+Route::middleware(['auth', 'permission:user_management'])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware('permission:user_management')->group(function () {
+        Route::resource('/users', UserController::class);
+    });
+});
+Route::middleware(['auth', 'permission:course_management'])->prefix('admin')->name('admin.')->group(function () {
+    Route::middleware('permission:course_management')->group(function () {
+        Route::resource('/courses', CourseController::class);
+    });
+});
+
 Route::middleware(['auth', 'permission:create_course'])->group(function () {
     Route::get('/courses/create', function () {
         return "Form Create Course";

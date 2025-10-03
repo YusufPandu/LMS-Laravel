@@ -8,11 +8,12 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable,  HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -79,16 +80,16 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     public function getRoleName(): string{
-        return $this->role?->name ?? 'No Role';
+        return $this->role_id?->name ?? 'No Role';
     }
 
     public function isAdmin():bool{
-        return $this->getRoleName() === 'admin';
+        return $this->getRoleName() === 1;
     }
     public function isInstructor():bool{
-        return $this->getRoleName() === 'instructor';
+        return $this->getRoleName() === 2;
     }
     public function isStudent():bool{
-        return $this->getRoleName() === 'student';
+        return $this->getRoleName() === 3;
     }
 }

@@ -15,22 +15,34 @@ class RolePermissionSeeder extends Seeder
     public function run(): void
     {
         $admin = Role::where('name', 'admin')->first();
-        $admin->permissions()->sync(Permission::all());
+        $admin->permissions()->sync(Permission::whereIn('name', [
+            'dashboard_admin',
+            'user_management',
+            'course_management',
+            'reports',
+        ])->get());
 
         $instructor = Role::where('name', 'instructor')->first();
         $instructor->permissions()->sync(Permission::whereIn('name', [
-            'create_course',
-            'view_course',
-            'manage_modules',
-            'create_assignment',
-            'grade_assignment',
+            'dashboard_instructor',
+            'course_instructor',
+            'module_management',
+            'assignment_management',
+            'submission_review',
+            'discussion_management',
+            'certificate',
         ])->get());
 
 
         $student = Role::where('name', 'student')->first();
         $student->permissions()->sync(Permission::whereIn('name', [
-            'view_course',
+            'dashboard_student',
+            'course_student',
             'submit_assignment',
+            'details_course',
+            'discussion_student',
+            'progress_tracking',
+            'certificate',
         ])->get());
     }
 }
