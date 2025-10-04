@@ -18,6 +18,7 @@ class DashboardController extends Controller
                 'stats' => [
                     'Users' => \App\Models\User::count(),
                     'Courses' => \App\Models\Course::count(),
+                    'Certificates' => \App\Models\Certificate::count(),
                 ],
             ];
         } elseif ($user->role_id == 2) {
@@ -26,17 +27,25 @@ class DashboardController extends Controller
                 'title' => 'Instructor Dashboard',
                 'stats' => [
                     'My_Course' => \App\Models\Course::where('instructor_id', $user->id)->count(),
-                    'Assignments' => 12,
-                    'Students' => 50,
+                    'Assignments' => \App\Models\Assignment::where('course_id', $user->id)->count(),
+                    'Students' => \App\Models\User::where('role_id', 3)->count(),
                 ],
             ];
         } else {
             // Student data
+            $totalAssignments = \App\Models\Assignment::count();
+            $totalSubmissions = \App\Models\Submission::where('student_id', $user->id)->count();
+
+            $progress = $totalAssignments > 0
+                ? intval(($totalSubmissions / $totalAssignments) * 100) . '%'
+                : '0%';
+
             $data = [
                 'title' => 'Student Dashboard',
                 'stats' => [
-                    'Assignments_Submitted' => 8,
-                    'progress' => '75%',
+                    'Assignments_Submitted' => $totalSubmissions,
+                    'progress' => $progress,
+                    'Certificates' => \App\Models\Certificate::where('student_id', $user->id)->count(),
                 ],
             ];
         }
