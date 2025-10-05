@@ -23,7 +23,7 @@ class Role extends Model
     }
     public function permissions()
     {
-        return $this->belongsToMany(Permission::class, 'role_permission');
+        return $this->belongsToMany(Permission::class, 'role_permission')->withTimestamps();
     }
     public function hasPermission(string $permission): bool
     {
@@ -31,7 +31,10 @@ class Role extends Model
     }
     public function givePermission(Permission $permission)
     {
-        return $this->permissions()->attach($permission);
+        if (!$this->hasPermission($permission->name)) {
+            return $this->permissions()->attach($permission->id);
+        }
+        return false;
     }
     public function removePermission(Permission $permission)
     {

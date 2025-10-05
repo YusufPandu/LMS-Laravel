@@ -12,6 +12,7 @@
                     <tr>
                         <th class="px-4 py-3">ID</th>
                         <th class="px-4 py-3">Title</th>
+                        <th class= "px-4 py-3">Description</th>
                         <th class="px-4 py-3">Instructor</th>
                         <th class="px-4 py-3">Created At</th>
                         <th class="px-4 py-3 text-center">Action</th>
@@ -22,6 +23,7 @@
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-3 font-medium text-gray-900">{{ $course->id }}</td>
                             <td class="px-4 py-3">{{ $course->title }}</td>
+                            <td class="px-4 py-3">{{$course->description}}</td>
                             <td class="px-4 py-3">
                                 <span class="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-600">
                                     {{ $course->instructor->name ?? '-' }}
